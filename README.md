@@ -40,7 +40,7 @@ DB_SERVER=localhost
 DB_NAME=database_name
 DB_USER=username
 DB_PASSWORD=password
-```
 
-# 접근 허용하는 데이터이스 (comma-separated)
+# 접근 허용하는 DB (comma-separated)
 ALLOWED_DATABASES=Common,Member
+```
