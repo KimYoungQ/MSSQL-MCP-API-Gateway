@@ -6,11 +6,11 @@
 
 ```
 Claude AI (클라이언트)
-    ↓ [MCP Protocol - stdio]
+    ↓
 MCP 서버 (Python - FastMCP)
-    ↓ [HTTP/HTTPS REST API]
+    ↓ 
 API Gateway (Node.js + Express)
-    ↓ [MSSQL 프로토콜]
+    ↓
 MSSQL Database
 ```
 
