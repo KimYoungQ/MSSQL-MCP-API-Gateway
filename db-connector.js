@@ -85,9 +85,56 @@ async function closePool() {
   }
 }
 
+/**
+ * Execute a stored procedure on a specific database
+ * @param {string} database - Database name
+ * @param {string} procedure - Stored procedure name
+ * @param {Object} parameters - Key-value pairs of parameters (e.g., {"@param1": "value1"})
+ * @returns {Promise<Object>} Execution results with returnValue, rowsAffected, resultSets, outputParameters
+ */
+async function executeStoredProcedure(database, procedure, parameters = {}) {
+  // Validate database is in whitelist
+  validateDatabase(database);
+
+  const dbPool = await getPool();
+
+  // Switch to the target database
+  await dbPool.request().query(`USE [${database}]`);
+
+  // Create request and add parameters
+  const request = dbPool.request();
+
+  for (const [key, value] of Object.entries(parameters)) {
+    const paramName = key.startsWith('@') ? key.substring(1) : key;
+    request.input(paramName, value);
+  }
+
+  // Execute stored procedure
+  const result = await request.execute(procedure);
+
+  // Format response
+  const response = {
+    returnValue: result.returnValue,
+    rowsAffected: result.rowsAffected ? result.rowsAffected.reduce((a, b) => a + b, 0) : 0,
+    outputParameters: result.output || {},
+    resultSets: []
+  };
+
+  // Handle result sets
+  if (result.recordsets && result.recordsets.length > 0) {
+    response.resultSets = result.recordsets.map(recordset => ({
+      rows: recordset,
+      count: recordset.length
+    }));
+  }
+
+  return response;
+}
+
 module.exports = {
   getPool,
   executeQuery,
+  executeStoredProcedure,
   closePool,
   validateDatabase,
   allowedDatabases

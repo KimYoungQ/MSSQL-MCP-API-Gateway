@@ -106,8 +106,30 @@ function validateDatabaseName(databaseName) {
   return { valid: true };
 }
 
+/**
+ * Validate stored procedure name
+ * SQL Injection prevention - only allows safe characters
+ * @param {string} name - Stored procedure name to validate
+ * @returns {{valid: boolean, error?: string}}
+ */
+function validateStoredProcedureName(name) {
+  if (!name || typeof name !== 'string') {
+    return { valid: false, error: 'Stored procedure name is required' };
+  }
+
+  // Allow only alphanumeric characters and underscores (max 128 chars)
+  // Must start with letter or underscore
+  const validPattern = /^[a-zA-Z_][a-zA-Z0-9_]{0,127}$/;
+  if (!validPattern.test(name)) {
+    return { valid: false, error: 'Invalid stored procedure name format' };
+  }
+
+  return { valid: true };
+}
+
 module.exports = {
   validateQuery,
   validateTableName,
-  validateDatabaseName
+  validateDatabaseName,
+  validateStoredProcedureName
 };
